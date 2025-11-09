@@ -16,13 +16,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.List;
 import java.io.IOException;
-import java.util.Collections;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -53,6 +53,10 @@ public class JwtFilter extends OncePerRequestFilter {
                     principal, null, authorities
             );
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            System.out.println("JWT parsed role: " + role);
+            System.out.println("JWT authorities: " + authorities);
+            System.out.println("JWT email: " + email);
+
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

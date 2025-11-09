@@ -4,6 +4,7 @@ import com.innomax.InnomaxBackend.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "client_goals")
 @Getter
@@ -21,6 +22,7 @@ public class Goal {
     // Link to user (so we know who owns the goal)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
     @Column(nullable = false)

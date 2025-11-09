@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+
 @Entity
 @Table(name = "client_sips")
 @Getter
