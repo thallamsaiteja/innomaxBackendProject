@@ -4,7 +4,7 @@ import com.innomax.InnomaxBackend.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "risk_profile_results")
 @Getter
@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class RiskProfileResult {
 
     @Id
@@ -31,4 +32,6 @@ public class RiskProfileResult {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+
 }

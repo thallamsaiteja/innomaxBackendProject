@@ -10,8 +10,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByMobile(String mobile);
 
-    @Query("select count(u) from User u where u.role = 'CLIENT'")
+    long countByRoleIgnoreCase(String role);
+    List<User> findByRoleIgnoreCase(String role);
+    @Query("SELECT COUNT(u) FROM User u WHERE UPPER(u.role) = 'CLIENT'")
     long countClients();
+
+    // ✅ Case-insensitive find clients
+    @Query("SELECT u FROM User u WHERE UPPER(u.role) = 'CLIENT'")
+    List<User> findAllClients();
 
     List<User> findByRole(String role);
 

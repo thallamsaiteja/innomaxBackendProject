@@ -3,7 +3,7 @@ package com.innomax.InnomaxBackend.goals.entity;
 import com.innomax.InnomaxBackend.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "client_goals")
 @Getter
@@ -11,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Goal {
 
     @Id

@@ -1,7 +1,7 @@
 package com.innomax.InnomaxBackend.config;
 
-import com.innomax.InnomaxBackend.auth.filter.JwtFilter;
 import com.innomax.InnomaxBackend.auth.config.JwtAuthenticationEntryPoint;
+import com.innomax.InnomaxBackend.auth.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,12 +9,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.Customizer;
 
 import java.util.List;
 
@@ -30,27 +32,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Enable CORS
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        // ✅ Explicitly allow CLIENT for all HTTP methods
-                        .requestMatchers(HttpMethod.GET, "/api/client/**").hasAuthority("CLIENT")
-                        .requestMatchers(HttpMethod.POST, "/api/client/**").hasAuthority("CLIENT")
-                        .requestMatchers(HttpMethod.PUT, "/api/client/**").hasAuthority("CLIENT")
-                        .requestMatchers(HttpMethod.DELETE, "/api/client/**").hasAuthority("CLIENT")
-                        .requestMatchers("/api/dashboard/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/client/**").hasAuthority("ROLE_CLIENT")
+                        .requestMatchers("/api/dashboard/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
-
-
-                // Exception handler for unauthorized access
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                // Disable session (use JWT instead)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Add JWT filter before the UsernamePasswordAuthenticationFilter
+        // ✅ Attach your JWT filter here (before default auth filter)
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -66,9 +60,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // React dev server
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin"
+        ));
         config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

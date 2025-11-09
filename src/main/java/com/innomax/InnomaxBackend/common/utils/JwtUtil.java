@@ -12,7 +12,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private final String SECRET_KEY = "InnomaxSuperSecretKeyForJWTGeneration123456";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
@@ -45,6 +45,7 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
+                    .setAllowedClockSkewSeconds(60)
                     .build()
                     .parseClaimsJws(token);
             return true;

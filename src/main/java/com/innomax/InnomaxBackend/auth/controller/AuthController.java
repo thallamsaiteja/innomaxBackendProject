@@ -25,12 +25,20 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> loginRequest) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
+
         String token = authService.login(email, password);
-        return Map.of("token", token);
+        User user = authService.getUserByEmail(email); // You can add a helper for this
+
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "userId", user.getUserId(),
+                "role", user.getRole()
+        ));
     }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
